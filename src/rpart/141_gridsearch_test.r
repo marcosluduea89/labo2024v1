@@ -112,33 +112,44 @@ tb_grid_search <- data.table( max_depth = integer(),
 
 
 # itero por los loops anidados para cada hiperparametro
+tb_grid_search <- data.frame(vcp = numeric(),
+                             vmin_bucket = numeric(),
+                             vmax_depth = numeric(),
+                             vmin_split = numeric(),
+                             ganancia_promedio = numeric())
 
-for (vmax_depth in c(4, 6, 8, 10, 12, 14)) {
-  for (vmin_split in c(1000, 800, 600, 400, 200, 100, 50, 20, 10)) {
-    # notar como se agrega
+for (vmax_depth in c(3,4,5,6,7,8)) {
+  for (vmin_split in c(650,660,670,680,690,700,710,720,730,740,750,760,770,780,790)) {
+    for (vcp in c(-0.25,-0.5,0,0.75)){
+      for (vmin_bucket in c(440,450,460,470,480,490)){
 
-    # vminsplit  minima cantidad de registros en un nodo para hacer el split
-    param_basicos <- list(
-      "cp" = -0.5, # complejidad minima
-      "minsplit" = vmin_split,
-      "minbucket" = 5, # minima cantidad de registros en una hoja
-      "maxdepth" = vmax_depth
-    ) # profundidad máxima del arbol
+        # vminsplit  minima cantidad de registros en un nodo para hacer el split
+        param_basicos <- list(
+          "cp" = vcp, # complejidad minima
+          "minsplit" = vmin_split,
+          "minbucket" = vmin_bucket, # minima cantidad de registros en una hoja
+          "maxdepth" = vmax_depth
+        ) # profundidad máxima del arbol
 
-    # Un solo llamado, con la semilla 17
-    ganancia_promedio <- ArbolesMontecarlo(PARAM$semillas, param_basicos)
+        # Un solo llamado, con la semilla 17
+        ganancia_promedio <- ArbolesMontecarlo(PARAM$semillas, param_basicos)
 
-    # agrego a la tabla
-    tb_grid_search <- rbindlist( 
-      list( tb_grid_search, 
-            list( vmax_depth, vmin_split, ganancia_promedio) ) )
+        # agrego a la tabla
+        tb_grid_search <- rbind(tb_grid_search, 
+                                data.frame(vcp, vmin_bucket, vmax_depth, vmin_split, ganancia_promedio))
 
+      }
+    }
   }
 
   # escribo la tabla a disco en cada vuelta del loop mas externo
   Sys.sleep(2)  # espero un par de segundos
 
-  fwrite( tb_grid_search,
-          file = archivo_salida,
-          sep = "\t" )
+  fwrite(tb_grid_search,
+         file = archivo_salida,
+         sep = "\t",
+         append = TRUE,
+         row.names = FALSE,
+         col.names = FALSE)
 }
+print(tb_grid_search)
