@@ -152,4 +152,4 @@ for (vmax_depth in c(3,4,5,6,7,8)) {
          row.names = FALSE,
          col.names = FALSE)
 }
-print(tb_grid_search)
+tb_grid_search
