@@ -415,16 +415,16 @@ CanaritosAsesinos <- function(
     seed = canaritos_semilla,
     max_depth = -1, # -1 significa no limitar,  por ahora lo dejo fijo
     min_gain_to_split = 0.0, # por ahora, lo dejo fijo
-    lambda_l1 = 0.0, # por ahora, lo dejo fijo
-    lambda_l2 = 0.0, # por ahora, lo dejo fijo
-    max_bin = 31, # por ahora, lo dejo fijo
+    lambda_l1 = 0.01, # por ahora, lo dejo fijo
+    lambda_l2 = 0.01, # por ahora, lo dejo fijo
+    max_bin = 250, # por ahora, lo dejo fijo
     num_iterations = 9999, # un numero grande, lo limita early_stopping_rounds
     force_row_wise = TRUE, # para que los alumnos no se atemoricen con  warning
     learning_rate = 0.065,
-    feature_fraction = 1.0, # lo seteo en 1
-    min_data_in_leaf = 260,
-    num_leaves = 60,
-    early_stopping_rounds = 200,
+    feature_fraction = 0.8, # lo seteo en 1
+    min_data_in_leaf = 200,
+    num_leaves = 50,
+    early_stopping_rounds = 100,
     num_threads = 1
   )
 
