@@ -20,6 +20,8 @@ envg$EXPENV$repo_dir <- "~/labo2024v1/"
 envg$EXPENV$datasets_dir <- "~/buckets/b1/datasets/"
 envg$EXPENV$arch_sem <- "mis_semillas.txt"
 
+EXP_CODE = "FE_experimento_FINAL_001"
+
 # default
 envg$EXPENV$gcloud$RAM <- 64
 envg$EXPENV$gcloud$cCPU <- 8
@@ -91,7 +93,7 @@ DR_drifting_baseline <- function( pmyexp, pinputexps, pserver="local")
   if( -1 == (param_local <- exp_init( pmyexp, pinputexps, pserver ))$resultado ) return( 0 )# linea fija
 
 
-  param_local$meta$script <- "/src/workflow-01/z531_DR_corregir_drifting.r"
+  param_local$meta$script <- "/src/workflow-01/wgpc531_DR_corregir_drifting.r"
 
   # No me engraso las manos con Feature Engineering manual
   param_local$variables_intrames <- TRUE
@@ -109,31 +111,40 @@ FE_historia_baseline <- function( pmyexp, pinputexps, pserver="local")
   if( -1 == (param_local <- exp_init( pmyexp, pinputexps, pserver ))$resultado ) return( 0 )# linea fija
 
 
-  param_local$meta$script <- "/src/workflow-01/z541_FE_historia.r"
+  param_local$meta$script <- "/src/workflow-01/z541_FE_historia_EPIC.r"
 
   param_local$lag1 <- TRUE
-  param_local$lag2 <- FALSE # no me engraso con los lags de orden 2
-  param_local$lag3 <- FALSE # no me engraso con los lags de orden 3
+  param_local$lag2 <- TRUE # no me engraso con los lags de orden 2
+  param_local$lag3 <- TRUE # no me engraso con los lags de orden 3
+  param_local$lag4 <- TRUE # no me engraso con los lags de orden 4
+  param_local$lag5 <- TRUE # no me engraso con los lags de orden 5
+  param_local$lag6 <- TRUE # no me engraso con los lags de orden 6
+  param_local$lag7 <- TRUE # no me engraso con los lags de orden 7
+  param_local$lag8 <- TRUE # no me engraso con los lags de orden 8
+  param_local$lag9 <- TRUE # no me engraso con los lags de orden 9
+
+  param_local$RatiosEpico$run <- FALSE
+  param_local$RatiosEpicoDiv0NA$run <- FALSE
 
   # baseline
   param_local$Tendencias1$run <- TRUE  # FALSE, no corre nada de lo que sigue
   param_local$Tendencias1$ventana <- 6
   param_local$Tendencias1$tendencia <- TRUE
-  param_local$Tendencias1$minimo <- FALSE
-  param_local$Tendencias1$maximo <- FALSE
-  param_local$Tendencias1$promedio <- FALSE
-  param_local$Tendencias1$ratioavg <- FALSE
-  param_local$Tendencias1$ratiomax <- FALSE
+  param_local$Tendencias1$minimo <- TRUE
+  param_local$Tendencias1$maximo <- TRUE
+  param_local$Tendencias1$promedio <- TRUE
+  param_local$Tendencias1$ratioavg <- TRUE
+  param_local$Tendencias1$ratiomax <- TRUE
 
   # baseline
-  param_local$Tendencias2$run <- FALSE
+  param_local$Tendencias2$run <- TRUE
   param_local$Tendencias2$ventana <- 6
   param_local$Tendencias2$tendencia <- TRUE
-  param_local$Tendencias2$minimo <- FALSE
-  param_local$Tendencias2$maximo <- FALSE
-  param_local$Tendencias2$promedio <- FALSE
-  param_local$Tendencias2$ratioavg <- FALSE
-  param_local$Tendencias2$ratiomax <- FALSE
+  param_local$Tendencias2$minimo <- TRUE
+  param_local$Tendencias2$maximo <- TRUE
+  param_local$Tendencias2$promedio <- TRUE
+  param_local$Tendencias2$ratioavg <- TRUE
+  param_local$Tendencias2$ratiomax <- TRUE
 
 
   # vaseline
@@ -144,9 +155,9 @@ FE_historia_baseline <- function( pmyexp, pinputexps, pserver="local")
   param_local$RandomForest$mtry <- 40
 
   # varia de 0.0 a 2.0, si es 0.0 NO se activan
-  param_local$CanaritosAsesinos$ratio <- 0.0
+  param_local$CanaritosAsesinos$ratio <- 2.0
   # desvios estandar de la media, para el cutoff
-  param_local$CanaritosAsesinos$desvios <- 4.0
+  param_local$CanaritosAsesinos$desvios <- 0.75
 
   return( exp_correr_script( param_local ) ) # linea fija
 }
@@ -169,7 +180,7 @@ TS_strategy_baseline_202109 <- function( pmyexp, pinputexps, pserver="local")
   param_local$train$testing <- c(202107)
 
   # undersampling  baseline
-  param_local$train$undersampling <- 0.2
+  param_local$train$undersampling <- 0.5
 
   return( exp_correr_script( param_local ) ) # linea fija
 }
@@ -266,7 +277,7 @@ ZZ_final_baseline <- function( pmyexp, pinputexps, pserver="local")
   param_local$modelos_rank <- c(1)
 
   param_local$kaggle$envios_desde <-  9500L
-  param_local$kaggle$envios_hasta <- 11500L
+  param_local$kaggle$envios_hasta <- 14500L
   param_local$kaggle$envios_salto <-   500L
 
   # para el caso que deba graficar
@@ -292,7 +303,7 @@ ZZ_final_semillerio_baseline <- function( pmyexp, pinputexps, pserver="local")
   param_local$modelos_rank <- c(1)
 
   param_local$kaggle$envios_desde <-  9500L
-  param_local$kaggle$envios_hasta <- 11500L
+  param_local$kaggle$envios_hasta <- 14500L
   param_local$kaggle$envios_salto <-   500L
 
   # para el caso que deba graficar
@@ -319,18 +330,18 @@ corrida_baseline_semillerio_202109 <- function( pnombrewf, pvirgen=FALSE )
 {
   if( -1 == exp_wf_init( pnombrewf, pvirgen) ) return(0) # linea fija
 
-  DT_incorporar_dataset_baseline( "DT0001-sem", "competencia_2024.csv.gz")
-  CA_catastrophe_baseline( "CA0001-sem", "DT0001-sem" )
+  DT_incorporar_dataset_baseline( paste("DT0001-sem", EXP_CODE,sep="" ), "competencia_2024.csv.gz")
+  CA_catastrophe_baseline( paste("CA0001-sem",EXP_CODE,sep=""),paste( "DT0001-sem",EXP_CODE,sep=""))
 
-  DR_drifting_baseline( "DR0001-sem", "CA0001-sem" )
-  FE_historia_baseline( "FE0001-sem", "DR0001-sem" )
+  DR_drifting_baseline( paste("DR0001-sem",EXP_CODE,sep=""),paste("CA0001-sem",EXP_CODE,sep=""))
+  FE_historia_baseline(paste("FE0001-sem",EXP_CODE,sep=""),paste("DR0001-sem",EXP_CODE,sep="" ))
 
-  TS_strategy_baseline_202109( "TS0001-sem", "FE0001-sem" )
+  TS_strategy_baseline_202109( paste("TS0001-sem",EXP_CODE,sep=""),paste( "FE0001-sem",EXP_CODE,sep="") )
 
-  HT_tuning_baseline( "HT0001-sem", "TS0001-sem" )
+  HT_tuning_baseline(paste("HT0001-sem",EXP_CODE,sep=""),paste( "TS0001-sem",EXP_CODE,sep="") )
 
   # El ZZ depente de HT y TS
-  ZZ_final_semillerio_baseline( "ZZ0001-sem", c("HT0001-sem","TS0001-sem") )
+  ZZ_final_semillerio_baseline( paste("ZZ0001-sem",EXP_CODE,sep=""), c(paste("HT0001-sem",EXP_CODE,sep=""),paste("TS0001-sem",EXP_CODE,sep="")) )
 
 
   exp_wf_end( pnombrewf, pvirgen ) # linea fija
@@ -347,18 +358,18 @@ corrida_baseline_semillerio_202107 <- function( pnombrewf, pvirgen=FALSE )
 {
   if( -1 == exp_wf_init( pnombrewf, pvirgen) ) return(0) # linea fija
 
-  DT_incorporar_dataset_baseline( "DT0001-sem", "competencia_2024.csv.gz")
-  CA_catastrophe_baseline( "CA0001-sem", "DT0001-sem" )
+  DT_incorporar_dataset_baseline( paste("DT0001-sem", EXP_CODE, sep=""), "competencia_2024.csv.gz")
+  CA_catastrophe_baseline( paste("CA0001-sem", EXP_CODE, sep=""),paste( "DT0001-sem", EXP_CODE, sep="") )
 
-  DR_drifting_baseline( "DR0001-sem", "CA0001-sem" )
-  FE_historia_baseline( "FE0001-sem", "DR0001-sem" )
+  DR_drifting_baseline( paste("DR0001-sem",EXP_CODE, sep=""),paste( "CA0001-sem", EXP_CODE, sep="") )
+  FE_historia_baseline(paste( "FE0001-sem", EXP_CODE, sep=""),paste( "DR0001-sem", EXP_CODE, sep="") )
 
-  TS_strategy_baseline_202107( "TS0002-sem", "FE0001-sem" )
+  TS_strategy_baseline_202107( paste("TS0002-sem", EXP_CODE, sep=""),paste( "FE0001-sem", EXP_CODE, sep="") )
 
-  HT_tuning_baseline( "HT0002-sem", "TS0002-sem" )
+  HT_tuning_baseline(paste( "HT0002-sem", EXP_CODE, sep=""),paste( "TS0002-sem", EXP_CODE, sep="") )
 
   # El ZZ depente de HT y TS
-  ZZ_final_semillerio_baseline( "ZZ0002-sem", c("HT0002-sem","TS0002-sem") )
+  ZZ_final_semillerio_baseline( paste("ZZ0002-sem", EXP_CODE, sep=""), c(paste("HT0002-sem", EXP_CODE, sep=""),paste("TS0002-sem", EXP_CODE, sep="") ))
 
 
   exp_wf_end( pnombrewf, pvirgen ) # linea fija
@@ -369,12 +380,12 @@ corrida_baseline_semillerio_202107 <- function( pnombrewf, pvirgen=FALSE )
 #Aqui empieza el programa
 
 
-corrida_baseline_semillerio_202109( "basem01" )
+corrida_baseline_semillerio_202109( paste("basem01",EXP_CODE,sep="" ))
 
 
 # Luego partiendo de  FE0001
 # genero TS0002, HT0002 y ZZ0002
 
-corrida_baseline_semillerio_202107( "basem02" )
+#corrida_baseline_semillerio_202107( "basem02" )
 
  
